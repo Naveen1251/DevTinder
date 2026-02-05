@@ -1,0 +1,19 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "Tinder For Devs",
+  "main": "index.js",
+  "scripts": {
+    "start":"node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "ReactJS",
+    "nodeJS"
+  ],
+  "author": "Naveen Prakash",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
