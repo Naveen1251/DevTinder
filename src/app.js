@@ -3,18 +3,29 @@ const express = require("express");
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Hello World update");
+// This will match only GET requests to /user
+app.get("/user", (req, res) => {
+  res.send({firstName: 'naveen', lastName: 'Prakash'});
 });
 
-app.get("/test", (req, res) => {
+// This will match only POST requests to /user
+app.post("/user", (req, res) => {
+  res.send("Data successfully saved to DB");
+});
+
+// This will match only DELETE requests to /user
+app.delete("/user", (req, res) => {
+  res.send("Data successfully deleted from DB");
+});
+
+// This will match all the HTTP method API calls to /test
+app.use("/test", (req, res) => {
   res.send("Hello World from test");
 });
 
-
-app.get("/hello", (req, res) => {
-  res.send("Hello World from hellow route");
-});
+// app.use("/", (req, res) => {
+//   res.send("Hello World update");
+// });
 
 app.listen(3000, () => {    
   console.log("Server is running on http://localhost:3000");
