@@ -3,45 +3,39 @@ const express = require("express");
 
 const app = express();
 
-// Accepts any req if it is /user,/user/xyz,/user/abc/def
-app.get("/user", (req, res) => {
-  res.send({firstName: 'naveen', lastName: 'Prakash'});
-});
+// app.use("/user",rh1,[rh2,rh3],rh4,rh5)// This will also work
+// app.use("/user",rh1,rh2,rh3,rh4,rh5)// This will also work
+// app.use("/user",[rh1,rh2,rh3,rh4,rh5])// This will also work
 
-// Accepts any req if it is /ac,/abc 
-// (ab?c worked until express 4.x.x, but in express 5.x.x it is not working, so we can use regex to achieve the same result)
-app.get(/^\/ab?c$/, (req, res) => {
-  res.send({firstName: 'naveen', lastName: 'Prakash'});
-});
-app.get("/user", (req, res) => {
-  console.log(req.query); // to get optional filters and modifiers or query parameters
-  res.send({firstName: 'naveen', lastName: 'Prakash'});
-});
+// app.use("/user",(req, res) => {
+//   res.send("First user");
+// },(req, res) => {
+//   res.send("Second user");
+// })
+// In the above case you will get "First user" as response because 
+// the first callback function is sending the response 
+// and the second callback function will not be executed.
 
-// this is for dynamic routing
-app.get("/user/:id", (req, res) => {
-  console.log(req.params); // to get required route data
-  res.send({firstName: 'naveen', lastName: 'Prakash'});
-});
 
-// // This will match only POST requests to /user
-// app.post("/user", (req, res) => {
-//   res.send("Data successfully saved to DB");
-// });
+// app.use("/user",(req, res) => {
+//   // res.send("First user");
+// },(req, res) => {
+//   res.send("Second user");
+// })
+// If you are not handling the response in the first callback function 
+// then the second callback function will not be executed 
+// and you will see server hangs and does not send any response.
 
-// // This will match only DELETE requests to /user
-// app.delete("/user", (req, res) => {
-//   res.send("Data successfully deleted from DB");
-// });
+app.use("/user",(req, res,next) => {
+  // res.send("First user");
+  next();
+},(req, res) => {
+  res.send("Second user");
+})
+// In the above case you will get "Second user" as response because
+// the first callback function is calling next() to pass control to the next callback function 
+// and the second callback function is sending the response.
 
-// // This will match all the HTTP method API calls to /test
-// app.use("/test", (req, res) => {
-//   res.send("Hello World from test");
-// });
-
-// app.use("/", (req, res) => {
-//   res.send("Hello World update");
-// });
 
 app.listen(3000, () => {    
   console.log("Server is running on http://localhost:3000");
