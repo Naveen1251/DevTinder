@@ -1,42 +1,34 @@
 // import express from 'express'
 const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
+// Check Diff btwn app.use and app.all
+// Handle Auth middleware for all request GET, POST, PUT, DELETE
+// This authorization middleware will be applied to all routes that start with /admin
+app.use("/admin", adminAuth);
 
-// app.use("/user",rh1,[rh2,rh3],rh4,rh5)// This will also work
-// app.use("/user",rh1,rh2,rh3,rh4,rh5)// This will also work
-// app.use("/user",[rh1,rh2,rh3,rh4,rh5])// This will also work
-
-// app.use("/user",(req, res) => {
-//   res.send("First user");
-// },(req, res) => {
-//   res.send("Second user");
-// })
-// In the above case you will get "First user" as response because 
-// the first callback function is sending the response 
-// and the second callback function will not be executed.
+// When we call /user route, it will not execute the authorization middleware 
+// as it is not under /admin
+// When req comes to /user route, it will execute the userAuth middleware
+//  and then send the response.
 
 
-// app.use("/user",(req, res) => {
-//   // res.send("First user");
-// },(req, res) => {
-//   res.send("Second user");
-// })
-// If you are not handling the response in the first callback function 
-// then the second callback function will not be executed 
-// and you will see server hangs and does not send any response.
+app.get("/user", userAuth, (req, res) => {
+  res.send("User added successfully!");
+});
 
-app.use("/user",(req, res,next) => {
-  // res.send("First user");
-  next();
-},(req, res) => {
-  res.send("Second user");
-})
-// In the above case you will get "Second user" as response because
-// the first callback function is calling next() to pass control to the next callback function 
-// and the second callback function is sending the response.
+app.get("/admin/addUser", (req, res) => {
+  // Logic of checking if user is authorized 
+  res.send("User added successfully!");
+});
+app.get("/admin/deleteUser", (req, res) => {
+  // Logic of checking if user is authorized
+  res.send("User deleted successfully!");
+});
 
 
+// Checking logic for authorization can be implemented using middleware.
 app.listen(3000, () => {    
   console.log("Server is running on http://localhost:3000");
 });
