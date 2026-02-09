@@ -1,34 +1,24 @@
 // import express from 'express'
 const express = require("express");
-const { adminAuth, userAuth } = require("./middlewares/auth");
 
 const app = express();
-// Check Diff btwn app.use and app.all
-// Handle Auth middleware for all request GET, POST, PUT, DELETE
-// This authorization middleware will be applied to all routes that start with /admin
-app.use("/admin", adminAuth);
 
-// When we call /user route, it will not execute the authorization middleware 
-// as it is not under /admin
-// When req comes to /user route, it will execute the userAuth middleware
-//  and then send the response.
-
-
-app.get("/user", userAuth, (req, res) => {
-  res.send("User added successfully!");
+app.get("/getUserData", (req, res) => {
+  try {
+    throw new Error("Database connection failed");
+    res.send("User added successfully!");
+  } catch (err) {
+    res.status(500).send("Error fetching user data");
+  }
 });
 
-app.get("/admin/addUser", (req, res) => {
-  // Logic of checking if user is authorized 
-  res.send("User added successfully!");
-});
-app.get("/admin/deleteUser", (req, res) => {
-  // Logic of checking if user is authorized
-  res.send("User deleted successfully!");
+// err should always be first parameter
+// If you write this at last it will catch all the errors from the above routes 
+// and send a generic error message to the client,
+app.use("/", (err, req, res, next) => {
+  res.status(500).send("Something went wrong! Please try again later.");
 });
 
-
-// Checking logic for authorization can be implemented using middleware.
-app.listen(3000, () => {    
+app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");
 });
