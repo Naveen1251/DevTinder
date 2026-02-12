@@ -4,7 +4,7 @@
   "description": "Tinder For Devs",
   "main": "index.js",
   "scripts": {
-    "start":"node src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
   "keywords": [
@@ -14,6 +14,7 @@
   "author": "Naveen Prakash",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^8.22.1"
   }
 }

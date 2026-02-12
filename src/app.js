@@ -1,24 +1,31 @@
 // import express from 'express'
 const express = require("express");
-
+const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-app.get("/getUserData", (req, res) => {
+app.use(express.json()) //This middleware helps to convert json object into JS object and set into req body 
+// without above middleware if you clg(req.body), this will return undefined.
+
+app.post("/signup", async (req, res) => {
+
+  // creating a new instance of user model
+  const user = new User(req.body);
   try {
-    throw new Error("Database connection failed");
-    res.send("User added successfully!");
+    await user.save();
+    res.send("User Added Sucessfully");
   } catch (err) {
-    res.status(500).send("Error fetching user data");
+    res.status(400).send("Error saving the user");
   }
 });
 
-// err should always be first parameter
-// If you write this at last it will catch all the errors from the above routes 
-// and send a generic error message to the client,
-app.use("/", (err, req, res, next) => {
-  res.status(500).send("Something went wrong! Please try again later.");
-});
-
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+connectDB()
+  .then(() => {
+    console.log("Connected to MongoDB successfully!");
+    app.listen(3000, () => {
+      console.log("server is running on http://localhost:3000");
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err.message);
+  });
