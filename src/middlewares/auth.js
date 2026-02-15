@@ -1,21 +1,31 @@
-const adminAuth = (req, res, next) => {
-    console.log("Admin Auth Middleware executed");
-     const isAuthorized = true; 
-  if (isAuthorized) {
-    next();
-  } else {
-    res.status(401).send("Unauthorized");
-  }
-}
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const userAuth = (req, res, next) => {
-    console.log("User Auth Middleware executed");
-     const isAuthorized = true; 
-  if (isAuthorized) {
-    next();
-  } else {
-    res.status(401).send("Unauthorized");
-  }
-}
+const userAuth = async (req, res, next) => {
+  // read token from cookies
+  // validate the token
+  // find the user
+  try {
+    const { token } = req.cookies;
+    if(!token){
+      throw new Error("Token is not valid!!!!!!!")
+    }
 
-module.exports = { adminAuth, userAuth };
+    const decodedValue = await jwt.verify(token, "Dev@Tinder");
+
+    const {_id}  = decodedValue
+
+    const user  = await User.findById(_id)
+    if(!user){
+      throw new Error("user not found")
+    }
+
+    req.user = user
+    next()
+
+  } catch (err) {
+    res.status(400).send("Unauthorized: " + err.message);
+  }
+};
+
+module.exports = { userAuth };
