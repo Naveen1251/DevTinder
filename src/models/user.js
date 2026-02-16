@@ -1,5 +1,8 @@
 const mongoose = require("mongoose")
 const validator = require("validator") //this is a library which helps us to validate email,phone number etc
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
+
 
 const userSchema = new mongoose.Schema({ //if we dont right new also it works fine
     firstName:{   //firstName can be also written as first_name,firstname anything will work
@@ -54,6 +57,20 @@ const userSchema = new mongoose.Schema({ //if we dont right new also it works fi
     }
 
 },{timestamps: true}) //this will automatically add createdAt and updatedAt field in our database
+
+
+userSchema.methods.getJWT = async function(){ //we are creating a method getJWT which will generate a JWT token for the user
+    const user = this; //this will refer to the user document which is calling this method
+    const token = await jwt.sign({ _id: user._id }, "Dev@Tinder",{ expiresIn: "7d" }); //we are signing the token with user id and secret key and setting the expiration time of token to 7 days
+    return token;
+}
+
+userSchema.methods.validatePassword  = async function(passwordInputByUser){
+    const user = this;
+    const passwordHash = user.password
+    const isPasswordValid = await bcrypt.compare(passwordInputByUser,passwordHash)
+    return isPasswordValid;
+}
 
 const User = mongoose.model("user",userSchema); //First parameter is name of model,second is schema of model
 // User should always start with capital letter

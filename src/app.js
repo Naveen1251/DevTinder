@@ -56,15 +56,15 @@ app.post("/login", async (req, res) => {
       throw new Error("invalid credentials");
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await user.validatePassword(password)
     if (!validPassword) {
       throw new Error("invalid credentials");
     } else {
       // create a JWT token
-      const token = await jwt.sign({ _id: user._id }, "Dev@Tinder");
+      const token = await user.getJWT(); //we are calling the getJWT method which we have created in user model to generate a JWT token for the user
 
       // add the token to cookie and send response back to user
-      res.cookie("token", token);
+      res.cookie("token", token,{expires: new Date(Date.now() + 8 * 3600000) }); // Set the token in a cookie with an expiration time of 1 hour 
 
       res.send("Login sucessful!!");
     }
@@ -83,69 +83,14 @@ app.get("/profile", userAuth,async (req, res) => {
   }
 });
 
-// get user by firstname
-app.get("/user", async (req, res) => {
-  const userFirstName = req.body.firstName;
-  try {
-    const users = await User.find({ firstName: userFirstName });
-    if (users.length === 0) {
-      res.status(404).send("User Not Found");
-    } else {
-      res.send(users);
-    }
-  } catch (err) {
-    res.status(400).send("Something Went Wrong");
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  try{
+    const user  = req.user
+    res.send(user.firstName + " sent you connection request" )
+  }catch(err){
+    err.status(400).send("Error sending connection: " + err.message);
   }
-});
-
-// Get data of all users available in DB
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Something Went Wrong");
-  }
-});
-
-// Delete user
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    res.send("User Deleted sucessfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// update user data
-app.patch("/user/:userId", async (req, res) => {
-  const lastname = req.params?.userId;
-  const data = req.body;
-
-  const allowedUpdates = ["age", "gender", "photoUrl", "about"];
-  const isUpdateAllowed = Object.keys(data).every((update) =>
-    allowedUpdates.includes(update),
-  );
-  if (!isUpdateAllowed) {
-    return res.status(400).send("Invalid Updates");
-  }
-
-  try {
-    const updatedUser = await User.findOneAndUpdate(
-      { LastName: lastname },
-      data,
-      {
-        returnDocument: "after",
-        runValidators: true, // this will run the validators defined in the schema before updating the document
-      },
-    );
-    res.send("User Updated Successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
+})
 
 connectDB()
   .then(() => {
