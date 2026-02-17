@@ -15,7 +15,7 @@ authRouter.post("/signup", async (req, res) => {
     const { firstName, lastName, emailId, password } = req.body;
     const saltRounds = 10; // You can adjust the salt rounds as needed
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    
+
     // creating a new instance of user model
     const user = new User({
       firstName,
@@ -62,6 +62,10 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token",null,{expires: new Date(Date.now())}) //we are setting the token cookie to null and setting the expiration time to current time so that cookie will be deleted from browser; 
+  res.send("Logout successful!");
+});
 
 
 module.exports = authRouter;

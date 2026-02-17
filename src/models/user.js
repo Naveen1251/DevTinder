@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({ //if we dont right new also it works fi
         minlength: 8, //if we want to set minimum length of password
             validate(value){
                 if(!validator.isStrongPassword(value)){
-                throw new Error("Enter a strong Password"+value)
+                throw new Error("Enter a strong Password"+ value)
             }
             }
     },
@@ -54,6 +54,15 @@ const userSchema = new mongoose.Schema({ //if we dont right new also it works fi
     about:{
         type: String,
         default: "Hey there! I am using this app." //if user dont write anything in about section then this default about will be used
+    },
+    newPassword:{
+        type: String,
+        minlength: 8, //if we want to set minimum length of password
+            validate(value){
+                if(!validator.isStrongPassword(value)){
+                throw new Error("Enter a strong Password"+ value)
+            }
+            }
     }
 
 },{timestamps: true}) //this will automatically add createdAt and updatedAt field in our database
